@@ -1,0 +1,10 @@
+# biuld files
+/out/
+/build/
+
+# hidden cache of vs 
+.vs/
+
+# personal settings
+*.user
+*.suo

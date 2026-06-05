@@ -1,0 +1,52 @@
+cmake_minimum_required(VERSION 3.20)
+
+# принудительный запуск скачивания пакетов vcpkg
+set(VCPKG_MANIFEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+
+project(DXD2Engine CXX)
+
+# Предотвращаем сборку на не-Windows системах
+if(NOT WIN32)
+    message(FATAL_ERROR "DirectX поддерживается только на ОС Windows!")
+endif()
+
+# поддержка Unicode
+add_compile_definitions(UNICODE _UNICODE)
+
+# Включаем современный стандарт C++
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(imgui CONFIG REQUIRED)
+
+# Автоматически находим все файлы исходного кода (.cpp) и заголовков (.h)
+file(GLOB_RECURSE PROJECT_SOURCES 
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.hlsl"
+)
+
+# Создаем исполняемый файл
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+
+
+# Подключаем системные библиотеки DirectX из Windows SDK.
+# В VS вы прописывали их в свойствах линкера, здесь — одной командой.
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    d3d11.lib 
+    dxgi.lib
+    d3dcompiler.lib
+    imgui::imgui # тест работоспособности vcpkg 
+)
+
+# Настройка для Win32, чтобы при запуске не открывалась консоль
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    WIN32_EXECUTABLE TRUE
+)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_SOURCE_DIR}/assets/textures"   # Новый путь в корне проекта
+    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/textures"   # Старый путь рядом с .exe (как хочет код C++)
+    COMMENT "Копирование textures из папки assets в директорию сборки..."
+)
