@@ -23,7 +23,6 @@ private:
 	void FrameRender();
 	void SystemUpdate();
 private:
-	//Scene scene;
 	Window wnd;
 	Timer timer;
 
