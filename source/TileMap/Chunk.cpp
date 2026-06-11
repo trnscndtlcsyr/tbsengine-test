@@ -6,7 +6,9 @@ Chunk::Chunk(NoiseGenerator& gen, int chunkPosX, int chunkPosY, int tilePerWidth
 {
 	posX = chunkPosX;
 	posY = chunkPosY;
-	std::vector<Biome> biomes = gen.generateBiomesMap(tilePerWidth, tilePerHeight, posX * tilePerWidth, posY * tilePerHeight
+	std::vector<Biome> biomes = gen.generateBiomesMap(
+		tilePerWidth, tilePerHeight, 
+		posX * tilePerWidth, posY * tilePerHeight
 	);
 	for (size_t y = 0; y < tilePerHeight; ++y)
 	{

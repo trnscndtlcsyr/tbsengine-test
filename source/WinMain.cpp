@@ -1,5 +1,5 @@
 #include "Engine/Core.h"
-#include "Engine/Utils.h"
+#include "Engine/WinException.h"
 #include "Application.h"
 
 int CALLBACK wWinMain(
@@ -13,22 +13,18 @@ int CALLBACK wWinMain(
 		Application app{};
 		app.Run();
 	}
+	catch (WinException& se)
+	{
+		MessageBoxEx(nullptr, se.wwhat(), L"Windows Exception", MB_OK | MB_ICONEXCLAMATION, 0);
+	}
 	catch (std::exception& ex)
 	{
-		std::wstring errorMsg;
-		Utils::StringToWString(errorMsg, ex.what());
+		std::wstring errorMsg = WinException::Utf8ToWide(ex.what());
 		MessageBoxEx(nullptr, errorMsg.c_str(), L"Standart Exception", MB_OK | MB_ICONEXCLAMATION, 0);
 	}
 	catch (...)
 	{
 		MessageBoxEx(nullptr, L"????", L"Unknown Exception", MB_OK | MB_ICONEXCLAMATION, 0);
 	}
-	MessageBoxEx(
-		nullptr,
-		std::to_wstring(_CrtDumpMemoryLeaks()).c_str(),
-		L"MEMORY LEAK NOTIFICATION",
-		MB_OK | MB_ICONQUESTION,
-		0
-	);
 	return 0;
 }

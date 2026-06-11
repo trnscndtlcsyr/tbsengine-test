@@ -47,7 +47,7 @@ void Application::Initialize()
 void Application::FrameRender()
 {
 	wnd.gfx().RenderStartAndClear(0.5f, 0.5f, 0.7f, 1.0f);
-	for (auto& chunk : chunkMap.GetChunks())
+	for (auto& chunk : chunkMap->GetChunks())
 	{
 		if (cam.viewCulling(chunk.GetIsoPosition(), chunk.GetSize()))
 		{
@@ -64,7 +64,7 @@ void Application::FrameRender()
 	wss << "fps: " << timer.GetFPS() << std::endl;
 	wss << "time: " << timer.GetTime() << std::endl;
 	wss << "scale: " << transform.GetScaleFactor() << std::endl;
-	wss << "chunks: " << chunkMap.ChunkCount() << std::endl;
+	wss << "chunks: " << chunkMap->ChunkCount() << std::endl;
 
 	DrawTextInfo(wss.str().c_str(), cam.getView());
 	DrawCollision(cam.getView(), pCollisionBrush);

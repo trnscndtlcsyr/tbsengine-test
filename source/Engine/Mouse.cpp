@@ -1,6 +1,5 @@
 #include "Mouse.h"
 #include "Window.h"
-#include "Utils.h"
 
 Mouse::Event Mouse::Process() noexcept
 {

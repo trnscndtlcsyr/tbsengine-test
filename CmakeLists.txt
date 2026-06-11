@@ -10,6 +10,12 @@ if(NOT WIN32)
     message(FATAL_ERROR "DirectX поддерживается только на ОС Windows!")
 endif()
 
+if(MSVC)
+    add_compile_options(/fsanitize=address)
+    add_link_options(/fsanitize=address)
+    add_compile_options(/Od /Zi)
+endif()
+
 # поддержка Unicode
 add_compile_definitions(UNICODE _UNICODE)
 
@@ -20,7 +26,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(imgui CONFIG REQUIRED)
 
 # Автоматически находим все файлы исходного кода (.cpp) и заголовков (.h)
-file(GLOB_RECURSE PROJECT_SOURCES 
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" 
     "${CMAKE_CURRENT_SOURCE_DIR}/*.h" 
     "${CMAKE_CURRENT_SOURCE_DIR}/*.hlsl"

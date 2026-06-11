@@ -51,8 +51,8 @@ std::vector<Biome> NoiseGenerator::generateBiomesMap(int width, int height, floa
 std::vector<Biome> NoiseGenerator::setBiomes()
 {
     std::vector<Biome> biomes;
-    // =================================================================
-   // 1. ВОДНАЯ ЛИНИЯ 
+    // ================================================================
+   // 1. WATER LINE [min; 0]
    // =================================================================
     biomes.push_back(Biome(
         TileType::Abyss, 
@@ -73,9 +73,8 @@ std::vector<Biome> NoiseGenerator::setBiomes()
         Range(wParam.min, wParam.max)
     ));
     // =================================================================
-    // 2. АНОМАЛИИ И РЕДКИЕ ЗОНЫ 
+    // 2. RARE AND ANOMALY
     // =================================================================
-    // Вулканы и Горящие земли проверяем до обычных гор и пустынь!
     biomes.push_back(Biome(
         TileType::Volcano, 
         Range(190.0f, hParam.max),
@@ -113,7 +112,7 @@ std::vector<Biome> NoiseGenerator::setBiomes()
         Range(wParam.min, wParam.max)
     ));
     // =================================================================
-    // 3. ЛИНИЯ ГОР (Mountains Line: Высота 190+)
+    // 3. MOUNTAIN LINE [190; max]
     // =================================================================
     biomes.push_back(Biome(
         TileType::IceMountain, 
@@ -134,7 +133,7 @@ std::vector<Biome> NoiseGenerator::setBiomes()
         Range(0.0f, 0.75f)
     ));
     // =================================================================
-    // 4. ЛИНИЯ ХОЛМОВ (Hills Line: Высота 160 - 190)
+    // 4. HILL LINE [160;190]
     // =================================================================
     biomes.push_back(Biome(
         TileType::SnowyHill, 
@@ -187,11 +186,11 @@ std::vector<Biome> NoiseGenerator::setBiomes()
         Range(2.0f, 22.0f), 
         Range(humParam.min, 40.0f),
         Range(сParam.min, сParam.max),
-        Range(eParam.min, eParam.max), //[-1;1] так как существует высокогорное плато в районе холмистой местности с высоким уровнем эрозии
+        Range(eParam.min, eParam.max),
         Range(0.0f, 0.75f)
     ));
     // =================================================================
-    // 5. ЛИНИЯ БЕРЕГОВ (Shores Line: Высота 0 - 30)
+    // 5. SHORE LINE [0; 30]
     // =================================================================
     biomes.push_back(Biome(
         TileType::SnowyShore, 
@@ -212,7 +211,7 @@ std::vector<Biome> NoiseGenerator::setBiomes()
         Range(0.0f, 0.75f)
     ));
     // =================================================================
-    // 6. ЛИНИЯ РАВНИН (Plains Line: Высота 0 - 160)
+    // 6. PLAIN LINE [0; 160]
     // =================================================================
     // Холодные зоны
     biomes.push_back(Biome(
@@ -291,7 +290,7 @@ std::vector<Biome> NoiseGenerator::setBiomes()
         Range(0.0f, 0.75f)
     ));
     // =================================================================
-    // 7. ВРЕМЕННЫЕ БИОМЫ (аналоги нереализованных биомов)
+    // 7. TEMPORARY
     // =================================================================
     biomes.push_back(Biome(
         TileType::RainForest,
@@ -352,7 +351,7 @@ std::vector<Biome> NoiseGenerator::setBiomes()
     ));
 
     // =================================================================
-    // 8. ЗАЩИТНЫЙ СЛОЙ (Аварийный биом)
+    // 8. SECURE LAYER
     // =================================================================
     biomes.push_back(Biome(
         TileType::None, 

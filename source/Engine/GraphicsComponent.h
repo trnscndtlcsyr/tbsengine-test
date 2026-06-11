@@ -26,7 +26,7 @@ public:
 	GraphicsComponent(HWND hWnd);
 	GraphicsComponent(const GraphicsComponent&) = delete;
 	GraphicsComponent& operator=(const GraphicsComponent&) = delete;
-	~GraphicsComponent();
+	~GraphicsComponent() = default;
 	void RenderStartAndClear(float r, float g, float b, float a);
 	void RenderEnd();
 	void RenderResize(UINT width, UINT height);
@@ -41,7 +41,6 @@ public:
 	void Scale(Transform& transform,const D2D1_POINT_2F& view, float scaleFactor);
 	void ApplyTransform(Transform& transform);
 	const D2D1_SIZE_F GetRenderContextSize() const { return pD2d1Context->GetSize(); }
-	const D2D1_POINT_2F& GetDPI() const { return dpi; }
 private:
 	void DX3D11_CreateDeviceAndContext(D3D11_CREATE_DEVICE_FLAG creationFlags);
 	void ExtractDXGIDevice();
@@ -101,8 +100,6 @@ private:
 	comPtr<IDWriteFactory3> pDWriteFactory3 = nullptr;
 	comPtr<IDWriteTextFormat3> pTextFormat3 = nullptr;
 private:
-	UINT32 cTextLength;
-	D2D1_POINT_2F dpi = D2D1::Point2F(1.0f, 1.0f);
 	BOOL IsFullScreen = false;
 	BOOL IsChangeOnFullScreen = false;
 private:

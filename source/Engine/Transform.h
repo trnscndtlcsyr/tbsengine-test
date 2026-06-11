@@ -3,7 +3,6 @@
 #include<d2d1_1.h>
 #include<d2d1_1helper.h>
 
-//component which contain object position, scale, (rotation??), all object require transform inside
 class Transform
 {
 public:

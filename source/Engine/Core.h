@@ -4,15 +4,15 @@
 //unicode for winapi functions
 #ifndef UNICODE
 #define UNICODE
-#endif 
+#endif
 
 //lib and macros for memory dump leaks
-#define __CRTDBG_MAP_ALLOC
+//#define __CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <iostream>
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
+//#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+//#define new DEBUG_NEW
 
 //std and winapi libs
 #include<Windows.h>
