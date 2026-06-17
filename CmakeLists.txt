@@ -24,11 +24,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(imgui CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 # Автоматически находим все файлы исходного кода (.cpp) и заголовков (.h)
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" 
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.h" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" 
     "${CMAKE_CURRENT_SOURCE_DIR}/*.hlsl"
 )
 
@@ -42,7 +43,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     d3d11.lib 
     dxgi.lib
     d3dcompiler.lib
-    imgui::imgui # тест работоспособности vcpkg 
+    imgui::imgui
+    nlohmann_json::nlohmann_json
 )
 
 # Настройка для Win32, чтобы при запуске не открывалась консоль
@@ -53,6 +55,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_CURRENT_SOURCE_DIR}/assets/textures"   # Новый путь в корне проекта
-    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/textures"   # Старый путь рядом с .exe (как хочет код C++)
+    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/textures"   # Старый путь рядом с .exe
     COMMENT "Копирование textures из папки assets в директорию сборки..."
 )

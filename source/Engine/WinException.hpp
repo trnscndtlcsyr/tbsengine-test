@@ -5,7 +5,8 @@
 #include <source_location>
 #include <sstream>
 
-class WinException : public std::system_error {
+class WinException : public std::system_error 
+{
 public:
 	WinException(HRESULT hr, const std::string& expr, const std::source_location& loc);
 	const wchar_t* wwhat() const noexcept { return w_message.c_str(); }

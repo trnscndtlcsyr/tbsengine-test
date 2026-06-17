@@ -7,9 +7,9 @@ class Transform
 {
 public:
 	Transform()
-		: current(D2D1::Matrix3x2F::Identity())
+		: current{ D2D1::Matrix3x2F::Identity() }
 	{}
-	~Transform() {}
+	~Transform() = default;
 public:
 	float GetScaleFactor();
 	D2D1::Matrix3x2F& GetResultMatrix();

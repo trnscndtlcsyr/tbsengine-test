@@ -1,4 +1,4 @@
-#include "WinException.h"
+#include "WinException.hpp"
 
 WinException::WinException(
 	HRESULT hr,

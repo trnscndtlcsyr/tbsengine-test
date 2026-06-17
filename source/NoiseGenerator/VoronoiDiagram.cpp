@@ -1,4 +1,4 @@
-#include "VoronoiDiagram.h"
+#include "VoronoiDiagram.hpp"
 #include <random>
 
 float VoronoiDiagram::getDistanceToEdge(float posX, float posY)

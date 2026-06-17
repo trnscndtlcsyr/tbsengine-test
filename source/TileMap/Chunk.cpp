@@ -1,6 +1,6 @@
-#include "Chunk.h"
-#include "../NoiseGenerator/NoiseGenerator.h"
-#include "../NoiseGenerator/Biome.h"
+#include "Chunk.hpp"
+#include "../NoiseGenerator/NoiseGenerator.hpp"
+#include "../NoiseGenerator/Biome.hpp"
 
 Chunk::Chunk(NoiseGenerator& gen, int chunkPosX, int chunkPosY, int tilePerWidth, int tilePerHeight)
 {

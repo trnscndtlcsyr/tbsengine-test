@@ -1,8 +1,8 @@
-#include "UserInterface.h"
+#include "UserInterface.hpp"
 
 UserInterface::UserInterface()
 	:
-	padding(0.0f)
+	padding{ 0.0f }
 {
 }
 

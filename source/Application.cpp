@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "Application.hpp"
 
 int Application::Run()
 {
@@ -16,32 +16,17 @@ void Application::Initialize()
 {
 	pTextBrush = wnd.gfx().CreateBrush(D2D1::ColorF::White);
 	pCollisionBrush = wnd.gfx().CreateBrush(D2D1::ColorF(0.0f, 1.0f, 0.0f, 1.0f));
-
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test.png"), TileType::None));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_abyss.png"), TileType::Abyss));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_ocean.png"), TileType::Ocean));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_iceLand.png"), TileType::IceLand));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_shore.png"), TileType::Shore));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_snowyShore.png"), TileType::SnowyShore));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_plains.png"), TileType::Plains));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_fireLand.png"), TileType::FireLand));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_forest.png"), TileType::Forest));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_tundra.png"), TileType::Tundra));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_desert.png"), TileType::Desert));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_grassyHill.png"), TileType::GrassyHill));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_forestHill.png"), TileType::ForestHill));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_muddyHill.png"), TileType::MuddyHill));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_dryHill.png"), TileType::DryHill));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_snowyHill.png"), TileType::SnowyHill));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_desertDunes.png"), TileType::DesertDunes));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_volcano.png"), TileType::Volcano));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_rockyMountain.png"), TileType::RockyMountain));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_iceMountain.png"), TileType::IceMountain));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_swamp.png"), TileType::Swamp));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_rainForest.png"), TileType::RainForest));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_dryLand.png"), TileType::DryLand));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_savannah.png"), TileType::Savannah));
-	tileProfiles.push_back(TileProfile(wnd.gfx().LoadTexture(L"textures/tex_test_geyserLand.png"), TileType::GeyserLand));
+	AtlasData::SpriteDataPackage sdp = 
+		AtlasData::LoadJsonConfig<AtlasData::SpriteDataPackage>(L"textures/texAtlas.json");
+	AtlasData::MappingTable ct = 
+		AtlasData::LoadJsonConfig<AtlasData::MappingTable>(L"textures/mappingTable.json");
+	atlas = Texture2D(resManager.LoadBitmapResource(L"textures/texAtlas.png", wnd.gfx()));
+	for (const auto& [spriteName, spriteData] : sdp.frames)
+	{
+		auto it = ct.table.find(spriteName);
+		if(it != ct.table.end()) 
+			tileProfiles.push_back(TileProfile(spriteData, it->second));
+	}
 }
 
 void Application::FrameRender()
@@ -135,13 +120,16 @@ void Application::DrawTile(const Tile& tile)
 	{
 		if (tile.GetType() == profile.GetType())
 		{
-			wnd.gfx().DrawTexture2D(profile.GetTexture(), dst);
+			AtlasData::FrameData fData = profile.getData().frame;
+			D2D1_RECT_F srcDst = D2D1::RectF(fData.x, fData.y, fData.x + fData.w, fData.y + fData.h);
+			wnd.gfx().DrawSpriteFromAtlas(atlas, dst, srcDst);
+			//wnd.gfx().DrawTexture2D(profile.GetTexture(), dst);
 			break;
 		}
 	}
 }
 
-void Application::DrawCollision(const D2D1_RECT_F rect, const GraphicsComponent::comPtrBrush& brush)
+void Application::DrawCollision(const D2D1_RECT_F rect, const Graphics2D::comPtrBrush& brush)
 {
 	wnd.gfx().DrawRectangle2D(rect, brush.Get());
 }

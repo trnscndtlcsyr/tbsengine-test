@@ -14,39 +14,39 @@
 #include<d2d1_1helper.h>
 #include<wincodec.h>
 
-#include "Texture2D.h"
-#include "Transform.h"
+#include "Texture2D.hpp"
+#include "Transform.hpp"
 
-class GraphicsComponent
+class Graphics2D
 {
 public:
 	template<typename T> using comPtr = Microsoft::WRL::ComPtr<T>;
 	using comPtrBrush = comPtr<ID2D1SolidColorBrush>;
 public:
-	GraphicsComponent(HWND hWnd);
-	GraphicsComponent(const GraphicsComponent&) = delete;
-	GraphicsComponent& operator=(const GraphicsComponent&) = delete;
-	~GraphicsComponent() = default;
+	Graphics2D(HWND hWnd);
+	Graphics2D(const Graphics2D&) = delete;
+	Graphics2D& operator=(const Graphics2D&) = delete;
+	~Graphics2D() = default;
 	void RenderStartAndClear(float r, float g, float b, float a);
 	void RenderEnd();
 	void RenderResize(UINT width, UINT height);
-	ID2D1Bitmap* LoadBitmapResource(const WCHAR* filename);
-	Texture2D LoadTexture(const WCHAR* filename);
-	std::vector<Texture2D> LoadTextures(std::vector<const WCHAR*>& filenames);
+	void DrawSpriteFromAtlas(Texture2D& texAtlas, const D2D1_RECT_F& dst, const D2D1_RECT_F& srcDst) const;
 	void DrawTexture2D(Texture2D& texture, const D2D1_RECT_F& dst) const;
-	void DrawRectangle2D(const D2D1_RECT_F& rect, const comPtr<ID2D1SolidColorBrush>& brush) const;
-	void DrawLine2D(const D2D1_POINT_2F& start, const D2D1_POINT_2F& end, const comPtr<ID2D1SolidColorBrush>& brush) const;
-	void DrawText2D(const WCHAR* text, const D2D1_RECT_F& dst, const comPtr<ID2D1SolidColorBrush>& brush);
+	void DrawRectangle2D(const D2D1_RECT_F& rect, const comPtrBrush& brush) const;
+	void DrawLine2D(const D2D1_POINT_2F& start, const D2D1_POINT_2F& end, const comPtrBrush& brush) const;
+	void DrawText2D(const WCHAR* text, const D2D1_RECT_F& dst, const comPtrBrush& brush);
 	void Translate(Transform& transform,const D2D1_POINT_2F& move);
 	void Scale(Transform& transform,const D2D1_POINT_2F& view, float scaleFactor);
 	void ApplyTransform(Transform& transform);
 	const D2D1_SIZE_F GetRenderContextSize() const { return pD2d1Context->GetSize(); }
+	ID2D1DeviceContext* getDeviceContext2D() const { return pD2d1Context.Get(); }
+	IWICImagingFactory2* getIWICImagingFactory2() const { return pWICFactory2.Get(); }
 private:
 	void DX3D11_CreateDeviceAndContext(D3D11_CREATE_DEVICE_FLAG creationFlags);
 	void ExtractDXGIDevice();
 	void ExtractDXGIAdapter();
 	void CreateDXGIFactoryFromAdapter();
-	void CreateWICFactory();
+	comPtr<IWICImagingFactory2> CreateWICFactory();
 private:
 	void CreateSwapChain(DXGI_SCALING scaling, DXGI_SWAP_EFFECT swapEffect);
 	void ExtractBackBuffer();
@@ -70,7 +70,7 @@ private:
 private:
 	void DisableFullScreen();
 public:
-	comPtr<ID2D1SolidColorBrush> CreateBrush(D2D1::ColorF color);
+	comPtrBrush CreateBrush(D2D1::ColorF color);
 	void SetFullScreen(BOOL flag, UINT width, UINT height);
 private:
 	//Direct3D hardware base for direct2d
@@ -91,9 +91,8 @@ private:
 	//Frame output stuff 
 	comPtr<IDXGISwapChain3> pSwapChain3 = nullptr;
 	comPtr<ID3D11Texture2D> pBackBuffer = nullptr;
-	comPtr<ID2D1Bitmap1> pD2d1TargetBitmap1 = nullptr;
+	comPtr<ID2D1Bitmap1> pD2d1TargetBitmap1 = nullptr; 
 
-	//for bitmap creation
 	comPtr<IWICImagingFactory2> pWICFactory2 = nullptr;
 
 	//for text creation

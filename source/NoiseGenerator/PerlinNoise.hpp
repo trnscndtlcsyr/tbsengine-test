@@ -6,10 +6,8 @@ public:
     PerlinNoise() = default;
     PerlinNoise(unsigned int seed) 
         : 
-        seed(seed)
-    {
-        reseed();
-    }
+        seed{ seed }
+    { reseed(); }
     float createNoise2d(float x, float y);
 private:
     float grad(int hash, float xf, float yf) const;

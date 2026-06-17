@@ -8,10 +8,10 @@ public:
 	VoronoiDiagram() = default;
 	VoronoiDiagram(unsigned int seed, float scale) 
 		: 
-		seed(seed), 
-		spaceScale(scale),
-		rng(seed), 
-		distribution(0.0f, 1.0f)
+		seed{ seed },
+		spaceScale{ scale },
+		rng{ seed },
+		distribution{ 0.0f, 1.0f }
 	{}
 	~VoronoiDiagram() = default;
 	float getDistanceToEdge(float posX, float posY);

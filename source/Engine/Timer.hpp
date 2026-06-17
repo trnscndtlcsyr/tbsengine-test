@@ -16,11 +16,11 @@ class Timer
 public:
 	Timer() 
 		: 
-		time(0), 
-		previousTime(0), 
-		deltaTime(0), 
-		frames(0), 
-		framesPerSecond(0)
+		time{ 0.0f },
+		previousTime{ 0.0f },
+		deltaTime(0.0f),
+		frames{ 0 },
+		framesPerSecond{ 0 }
 	{ 
 		Reset(); 
 	}

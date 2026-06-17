@@ -1,4 +1,4 @@
-#include "ChunkMap.h"
+#include "ChunkMap.hpp"
 
 ChunkMap::ChunkMap()
 {

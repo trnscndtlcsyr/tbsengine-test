@@ -4,8 +4,8 @@
 #include<d2d1_1.h>
 #include<memory>
 
-#include "..\Engine\Texture2D.h"
-#include "GameTypes.h"
+#include "..\Engine\Texture2D.hpp"
+#include "GameTypes.hpp"
 
 class Tile
 {
@@ -18,10 +18,12 @@ public:
 public:
 	Tile() = default;
 	Tile(TileType type, int x, int y)
-		: Type(type), xPos(x), yPos(y) 
+		: 
+		Type{ type },
+		xPos{ x },
+		yPos{ y }
 	{}
-	~Tile()
-	{}
+	~Tile() = default;
 	TileType GetType() const { return Type; }
 	D2D1_POINT_2F GetPosition() const { return D2D1::Point2F(xPos, yPos); }
 	D2D1_POINT_2F GetIsoPosition() const { return OrthoToIso(xPos, yPos, s_TileWidth, s_TileHeight); }

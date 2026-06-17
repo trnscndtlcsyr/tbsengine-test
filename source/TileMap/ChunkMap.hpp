@@ -1,6 +1,6 @@
 #pragma once
-#include "Chunk.h"
-#include "../NoiseGenerator/NoiseGenerator.h"
+#include "Chunk.hpp"
+#include "../NoiseGenerator/NoiseGenerator.hpp"
 
 class ChunkMap
 {

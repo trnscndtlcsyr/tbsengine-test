@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "Tile.h"
-#include "../NoiseGenerator/NoiseGenerator.h"
+#include "Tile.hpp"
+#include "../NoiseGenerator/NoiseGenerator.hpp"
 
 class Chunk
 {

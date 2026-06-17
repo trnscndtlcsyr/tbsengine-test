@@ -4,18 +4,18 @@
 #include<string>
 #include<sstream>
 
-#include "GraphicsComponent.h"
-#include "Mouse.h"
+#include "Graphics2D.hpp"
+#include "Mouse.hpp"
 
 class Window
 {
 public:
-	Window(int width, int height, const wchar_t* name);
+	Window(UINT width, UINT height, const wchar_t* name);
 	~Window();
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 	int MessageProcessing();
-	GraphicsComponent& gfx();
+	Graphics2D& gfx();
 	std::pair<UINT, UINT> GetSize() { return { width, height }; }
 private:
 	void TextPost(HWND hWnd, const POINTS pt, const char* text);
@@ -33,7 +33,7 @@ private:
 	static constexpr const wchar_t* class_name = L"DX2D";
 	HWND hWnd;
 	HINSTANCE hInstance;
-	std::unique_ptr<GraphicsComponent> pRenderer;
+	std::unique_ptr<Graphics2D> pRenderer;
 	bool fullScreenState = false;
 	RECT windowRect;
 	static const UINT windowStyle = WS_OVERLAPPEDWINDOW;

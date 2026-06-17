@@ -1,6 +1,6 @@
-#include "GraphicsComponent.h"
-#include "Core.h"
-#include "WinException.h"
+#include "Graphics2D.hpp"
+#include "Core.hpp"
+#include "WinException.hpp"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d2d1.lib")
@@ -8,7 +8,7 @@
 #pragma comment(lib, "Dwrite")
 #pragma comment(lib, "windowscodecs.lib")
 
-GraphicsComponent::GraphicsComponent(HWND hWnd) : hr(S_OK), hWnd(hWnd)
+Graphics2D::Graphics2D(HWND hWnd) : hr{ S_OK }, hWnd{ hWnd }
 {
 	//create dxgi and dx3d11 components
 	DX3D11_CreateDeviceAndContext(D3D11_CREATE_DEVICE_BGRA_SUPPORT);
@@ -32,13 +32,12 @@ GraphicsComponent::GraphicsComponent(HWND hWnd) : hr(S_OK), hWnd(hWnd)
 	DX2D_CreateDeviceContext();
 	DX2D_SetContextTarget();
 
-	//image factory for bitmaps
-	CreateWICFactory();
+	pWICFactory2 = CreateWICFactory();
 
 	DisableFullScreen();
 }
 
-void GraphicsComponent::DX3D11_CreateDeviceAndContext(D3D11_CREATE_DEVICE_FLAG creationFlags)
+void Graphics2D::DX3D11_CreateDeviceAndContext(D3D11_CREATE_DEVICE_FLAG creationFlags)
 {
 	D3D_FEATURE_LEVEL m_featureLevel;
 	D3D_FEATURE_LEVEL featuresLevels[] =
@@ -65,7 +64,7 @@ void GraphicsComponent::DX3D11_CreateDeviceAndContext(D3D11_CREATE_DEVICE_FLAG c
 	));
 }
 
-void GraphicsComponent::ExtractDXGIDevice()
+void Graphics2D::ExtractDXGIDevice()
 {
 	if (pD3d11Device) 
 	{
@@ -73,7 +72,7 @@ void GraphicsComponent::ExtractDXGIDevice()
 	}
 }
 
-void GraphicsComponent::CreateDWriteFactory()
+void Graphics2D::CreateDWriteFactory()
 {
 	DX_CHECK(DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED, 
@@ -88,7 +87,7 @@ void GraphicsComponent::CreateDWriteFactory()
 /// <param name="font">Font family name</param>
 /// <param name="localeName">Font collection (nullptr sets it to use the system font collection)</param>
 /// <param name="fontSize">font size</param>
-void GraphicsComponent::CreateTextFormat(
+void Graphics2D::CreateTextFormat(
 	const WCHAR* font, 
 	const WCHAR* localeName, 
 	FLOAT fontSize
@@ -115,7 +114,7 @@ void GraphicsComponent::CreateTextFormat(
 /// <summary>
 /// set alignment for text and paragraph
 /// </summary>
-void GraphicsComponent::SetTextAlligments(
+void Graphics2D::SetTextAlligments(
 	DWRITE_TEXT_ALIGNMENT textAlg = DWRITE_TEXT_ALIGNMENT_LEADING,
 	DWRITE_PARAGRAPH_ALIGNMENT paragraphAlg = DWRITE_PARAGRAPH_ALIGNMENT_NEAR
 )
@@ -127,14 +126,14 @@ void GraphicsComponent::SetTextAlligments(
 	}
 }
 
-void GraphicsComponent::DX2D_CreateFactory()
+void Graphics2D::DX2D_CreateFactory()
 {
 	comPtr<ID2D1Factory> pBaseFactory;
 	DX_CHECK(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, IID_PPV_ARGS(&pBaseFactory)));
 	DX_CHECK(pBaseFactory.As(&pD2d1Factory3));
 }
 
-void GraphicsComponent::DX2D_CreateDevice()
+void Graphics2D::DX2D_CreateDevice()
 {
 	if (pD2d1Factory3 && pDxgiDevice3)
 	{
@@ -142,7 +141,7 @@ void GraphicsComponent::DX2D_CreateDevice()
 	}
 }
 
-void GraphicsComponent::DX2D_CreateDeviceContext()
+void Graphics2D::DX2D_CreateDeviceContext()
 {
 	if (pD2d1Device) 
 	{
@@ -150,7 +149,7 @@ void GraphicsComponent::DX2D_CreateDeviceContext()
 	}
 }
 
-void GraphicsComponent::ExtractDXGIAdapter()
+void Graphics2D::ExtractDXGIAdapter()
 {
 	if (pDxgiDevice3) 
 	{
@@ -158,7 +157,7 @@ void GraphicsComponent::ExtractDXGIAdapter()
 	}
 }
 
-void GraphicsComponent::CreateDXGIFactoryFromAdapter()
+void Graphics2D::CreateDXGIFactoryFromAdapter()
 {
 	if (pDxgiAdapter3)
 	{
@@ -166,7 +165,7 @@ void GraphicsComponent::CreateDXGIFactoryFromAdapter()
 	}
 }
 
-void GraphicsComponent::CreateSwapChain(
+void Graphics2D::CreateSwapChain(
 	DXGI_SCALING scaling, 
 	DXGI_SWAP_EFFECT swapEffect
 )
@@ -200,7 +199,7 @@ void GraphicsComponent::CreateSwapChain(
 	}
 }
 
-void GraphicsComponent::ExtractBackBuffer()
+void Graphics2D::ExtractBackBuffer()
 {
 	if (pSwapChain3) 
 	{
@@ -208,7 +207,7 @@ void GraphicsComponent::ExtractBackBuffer()
 	}
 }
 
-void GraphicsComponent::ExtractDXGIBackBuffer()
+void Graphics2D::ExtractDXGIBackBuffer()
 {
 	if (pSwapChain3) 
 	{
@@ -220,7 +219,7 @@ void GraphicsComponent::ExtractDXGIBackBuffer()
 /// Create bitmap from dxgiBackBuffer for getting target bitmap 
 /// and set target for DeviceContext (renderTarget)
 /// </summary>
-void GraphicsComponent::DX2D_SetContextTarget()
+void Graphics2D::DX2D_SetContextTarget()
 {
 	if (pD2d1Context && pDxgiBackBuffer)
 	{
@@ -244,116 +243,66 @@ void GraphicsComponent::DX2D_SetContextTarget()
 /// Create windows imaging component factory, com init and create com 
 /// instance with CLSID_WICImagingFactory param
 /// </summary>
-void GraphicsComponent::CreateWICFactory()
+Graphics2D::comPtr<IWICImagingFactory2> Graphics2D::CreateWICFactory()
 {
+	comPtr<IWICImagingFactory2> pWICFactory2;
 	DX_CHECK(CoInitialize(nullptr));
 	DX_CHECK(CoCreateInstance(
-		CLSID_WICImagingFactory2, 
-		nullptr, 
-		CLSCTX_INPROC_SERVER, 
+		CLSID_WICImagingFactory2,
+		nullptr,
+		CLSCTX_INPROC_SERVER,
 		IID_PPV_ARGS(&pWICFactory2)
 	));
+	return pWICFactory2;
 }
 
-GraphicsComponent::comPtr<ID2D1SolidColorBrush> GraphicsComponent::CreateBrush(D2D1::ColorF color)
+Graphics2D::comPtrBrush Graphics2D::CreateBrush(D2D1::ColorF color)
 {
 	if (pD2d1Context) {
 		D2D1_COLOR_F colorf = D2D1::ColorF(color);
-		comPtr<ID2D1SolidColorBrush> pBrush;
+		comPtrBrush pBrush;
 		DX_CHECK(pD2d1Context->CreateSolidColorBrush(colorf, &pBrush));
 		return pBrush;
 	}
 }
 
-ID2D1Bitmap* GraphicsComponent::LoadBitmapResource(const WCHAR* filename)
-{
-	IWICBitmapDecoder* pDecoder = nullptr;
-	DX_CHECK(pWICFactory2->CreateDecoderFromFilename(
-		filename,
-		nullptr,
-		GENERIC_READ,
-		WICDecodeMetadataCacheOnLoad,
-		&pDecoder
-	));
-
-	IWICBitmapFrameDecode* pWICFrame = nullptr;
-	DX_CHECK(pDecoder->GetFrame(0, &pWICFrame));
-
-	IWICFormatConverter* pWICFConverter = nullptr;
-	DX_CHECK(pWICFactory2->CreateFormatConverter(&pWICFConverter));
-
-	DX_CHECK(pWICFConverter->Initialize(
-		pWICFrame,
-		GUID_WICPixelFormat32bppPBGRA,
-		WICBitmapDitherTypeNone,
-		nullptr,
-		0.0,
-		WICBitmapPaletteTypeCustom
-	));
-
-	ID2D1Bitmap* bmp = nullptr;
-	DX_CHECK(pD2d1Context->CreateBitmapFromWicBitmap(pWICFConverter, nullptr, &bmp));
-
-	if (pDecoder) pDecoder->Release();
-	if (pWICFrame) pWICFrame->Release();
-	if (pWICFConverter) pWICFConverter->Release();
-	return bmp;
-}
-
-Texture2D GraphicsComponent::LoadTexture(const WCHAR* filename)
-{
-	Texture2D tex(LoadBitmapResource(filename));
-	return tex;
-}
-
-std::vector<Texture2D> GraphicsComponent::LoadTextures(std::vector<const WCHAR*>& fileData)
-{
-	std::vector<Texture2D> textures;
-	for (auto& fdata : fileData)
-	{
-		Texture2D tex(LoadBitmapResource(fdata));
-		textures.push_back(tex);
-	}
-	return textures;
-}
-
-void GraphicsComponent::DrawTexture2D(
-	Texture2D& texture,
-	const D2D1_RECT_F& dst
-) const
+void Graphics2D::DrawTexture2D(Texture2D& texture, const D2D1_RECT_F& dst) const
 {
 	pD2d1Context->DrawBitmap(
-		texture.GetBitmap(), 
+		texture.GetBitmap(),
 		dst, 
 		1.0f, 
 		D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
 }
 
-void GraphicsComponent::DrawRectangle2D(
-	const D2D1_RECT_F& rect, 
-	const comPtr<ID2D1SolidColorBrush>& brush
+void Graphics2D::DrawSpriteFromAtlas(
+	Texture2D& texAtlas, 
+	const D2D1_RECT_F& dst, 
+	const D2D1_RECT_F& srcDst
 ) const
+{
+	pD2d1Context->DrawBitmap(
+		texAtlas.GetBitmap(),
+		dst,
+		1.0f,
+		D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
+		srcDst);
+}
+
+void Graphics2D::DrawRectangle2D(const D2D1_RECT_F& rect, const comPtrBrush& brush) const
 {
 	pD2d1Context->DrawRectangle(rect, brush.Get());
 }
 
-void GraphicsComponent::DrawLine2D(
-	const D2D1_POINT_2F& start, 
-	const D2D1_POINT_2F& end, 
-	const comPtr<ID2D1SolidColorBrush>& brush
-) const
+void Graphics2D::DrawLine2D(const D2D1_POINT_2F& start, const D2D1_POINT_2F& end, const comPtrBrush& brush) const
 {
 	pD2d1Context->DrawLine(start, end, brush.Get());
 }
 
-void GraphicsComponent::DrawText2D(
-	const WCHAR* text, 
-	const D2D1_RECT_F& dst, 
-	const comPtr<ID2D1SolidColorBrush>& brush
-)
+void Graphics2D::DrawText2D(const WCHAR* text, const D2D1_RECT_F& dst, const comPtrBrush& brush)
 {
 	if (pD2d1Context) {
-		UINT32 cTextLength = (UINT32)wcslen(text);
+		UINT32 cTextLength = static_cast<UINT32>(wcslen(text));
 		pD2d1Context->DrawText(
 			text, 
 			cTextLength, 
@@ -364,21 +313,21 @@ void GraphicsComponent::DrawText2D(
 	}
 }
 
-void GraphicsComponent::RenderStartAndClear(float r, float g, float b, float a = 1.0f)
+void Graphics2D::RenderStartAndClear(float r, float g, float b, float a = 1.0f)
 {
 	D2D1_COLOR_F color = D2D1::ColorF(r, g, b, a);
 	pD2d1Context->BeginDraw();
 	pD2d1Context->Clear(color);
 }
 
-void GraphicsComponent::RenderEnd()
+void Graphics2D::RenderEnd()
 {
 	DX_CHECK(pD2d1Context->EndDraw());
 	UINT synchFlag = IsFullScreen ? 1 : 0;
 	DX_CHECK(pSwapChain3->Present(synchFlag, 0));
 }
 
-void GraphicsComponent::RenderResize(UINT width, UINT height)
+void Graphics2D::RenderResize(UINT width, UINT height)
 {
 	if (IsChangeOnFullScreen) return;
 
@@ -400,14 +349,14 @@ void GraphicsComponent::RenderResize(UINT width, UINT height)
 /// <summary>
 /// Does not allow alt+enter combination
 /// </summary>
-void GraphicsComponent::DisableFullScreen()
+void Graphics2D::DisableFullScreen()
 {
 	if (pDxgiFactory5) {
 		DX_CHECK(pDxgiFactory5->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER));
 	}
 }
 
-void GraphicsComponent::SetFullScreen(BOOL flag, UINT width, UINT height)
+void Graphics2D::SetFullScreen(BOOL flag, UINT width, UINT height)
 {
 	IsChangeOnFullScreen = true;
 	if (IsFullScreen == flag) return;
@@ -429,22 +378,22 @@ void GraphicsComponent::SetFullScreen(BOOL flag, UINT width, UINT height)
 	IsChangeOnFullScreen = false;
 }
 
-void GraphicsComponent::OnTransform(Transform& transform)
+void Graphics2D::OnTransform(Transform& transform)
 {
 }
 
-void GraphicsComponent::OnScaleChanged(Transform& transform)
+void Graphics2D::OnScaleChanged(Transform& transform)
 {
 	CreateTextFormat(L"Impact", L"en-us", 14.0f / transform.GetScaleFactor());
 	SetTextAlligments();
 }
 
-void GraphicsComponent::OnFullScreenChanged(BOOL flag)
+void Graphics2D::OnFullScreenChanged(BOOL flag)
 {
 	IsFullScreen = flag;
 }
 
-void GraphicsComponent::Translate(
+void Graphics2D::Translate(
 	Transform& transform,
 	const D2D1_POINT_2F& pos
 )
@@ -453,7 +402,7 @@ void GraphicsComponent::Translate(
 	ApplyTransform(transform);
 }
 
-void GraphicsComponent::Scale(
+void Graphics2D::Scale(
 	Transform& transform,
 	const D2D1_POINT_2F& view, 
 	float scaleFact
@@ -464,7 +413,7 @@ void GraphicsComponent::Scale(
 	ApplyTransform(transform);
 }
 
-void GraphicsComponent::ApplyTransform(Transform& transform)
+void Graphics2D::ApplyTransform(Transform& transform)
 {
 	if (pD2d1Context) {
 		pD2d1Context->SetTransform(transform.GetResultMatrix());

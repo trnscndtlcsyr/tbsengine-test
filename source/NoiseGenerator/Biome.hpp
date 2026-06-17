@@ -1,12 +1,12 @@
 #pragma once
-#include "../TIleMap/GameTypes.h"
+#include "../TIleMap/GameTypes.hpp"
 
 class Range
 {
 public:
     Range() = default;
-    Range(float min, float max) : Min(min), Max(max) {}
-    ~Range() {}
+    Range(float min, float max) : Min{ min }, Max{ max } {}
+    ~Range() = default;
     bool fits(float val) const { return Min <= val && val <= Max; }
 public:
     float Min, Max;
@@ -24,13 +24,13 @@ public:
         Range erosionR, 
         Range weirdnessR)
         :
-        Type(type),
-        HeightRange(heightR),
-        TemperatureRange(tempR),
-        HumidityRange(HumidityR),
-        ContinentalnessRange(continentalnessR),
-        ErosionRange(erosionR),
-        WeirdnessRange(weirdnessR)
+        Type{ type },
+        HeightRange{ heightR },
+        TemperatureRange{ tempR },
+        HumidityRange{ HumidityR },
+        ContinentalnessRange{ continentalnessR },
+        ErosionRange{ erosionR },
+        WeirdnessRange{ weirdnessR }
     {}
 public:
     TileType Type;

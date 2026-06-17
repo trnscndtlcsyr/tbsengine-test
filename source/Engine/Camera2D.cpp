@@ -1,4 +1,4 @@
-#include "Camera2D.h"
+#include "Camera2D.hpp"
 
 void Camera2D::setCameraView(Transform& transform, float w, float h)
 {

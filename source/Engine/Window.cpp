@@ -1,5 +1,5 @@
-#include "Window.h"
-#include "WinException.h"
+#include "Window.hpp"
+#include "WinException.hpp"
 
 void Window::InitWindowClass()
 {
@@ -20,21 +20,23 @@ void Window::InitWindowClass()
 	WIN_CHECK(RegisterClassEx(&wc));
 }
 
-Window::Window(int width, int height, const wchar_t* name) : width(width), height(height)
+Window::Window(UINT width, UINT height, const wchar_t* name) : width{ width }, height{ height }
 {
 	InitWindowClass();
-	RECT wr;
-	wr.left = 100;
-	wr.right = width + wr.left;
-	wr.top = 100;
-	wr.bottom = height + wr.top;
+	RECT wr{
+	.left = 100l,
+	.top = 100l ,
+	.right = static_cast<LONG>(width) + wr.left,
+	.bottom = static_cast<LONG>(height) + wr.top
+	};
 	WIN_CHECK(AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE));
 	hWnd = CreateWindowEx(
 		0,
 		class_name,
 		name,
 		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top,
+		CW_USEDEFAULT, CW_USEDEFAULT, 
+		wr.right - wr.left, wr.bottom - wr.top,
 		nullptr,
 		nullptr,
 		hInstance,
@@ -42,7 +44,7 @@ Window::Window(int width, int height, const wchar_t* name) : width(width), heigh
 	);
 	WIN_CHECK(hWnd);
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
-	pRenderer = std::make_unique<GraphicsComponent>(hWnd);
+	pRenderer = std::make_unique<Graphics2D>(hWnd);
 }
 
 Window::~Window()
@@ -66,7 +68,7 @@ int Window::MessageProcessing()
 	return 1;
 }
 
-GraphicsComponent& Window::gfx()
+Graphics2D& Window::gfx()
 {
 	WIN_CHECK(pRenderer);
 	return *pRenderer;
@@ -115,13 +117,14 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) no
 			UINT width = LOWORD(lParam);
 			UINT height = HIWORD(lParam);
 			OnResize(width, height);
+			break;
 		}
-		break;
 		case WM_MOUSEMOVE:
 		{
 			const POINTS pt = MAKEPOINTS(lParam);
-			if (pt.x >= 0 && pt.x < width && 
-				pt.y >= 0 && pt.y < height) {
+			if (pt.x >= 0 && pt.x < width 
+				&& pt.y >= 0 && pt.y < height) 
+			{
 				mouse.OnMouseMove(pt.x, pt.y);
 			}
 			break;
@@ -129,44 +132,38 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) no
 		case WM_MBUTTONDOWN:
 		{
 			mouse.OnWheelPressed();
-			const POINTS pt = MAKEPOINTS(lParam);
 			break;
 		}
 		case WM_MBUTTONUP:
 		{
 			mouse.OnWheelReleased();
-			const POINTS pt = MAKEPOINTS(lParam);
 			break;
 		}
 		case WM_LBUTTONUP:
 		{
 			mouse.OnLMBReleased();
-			const POINTS pt = MAKEPOINTS(lParam);
 			break;
 		}
 		case WM_LBUTTONDOWN:
 		{
 			mouse.OnLMBPressed();
-			const POINTS pt = MAKEPOINTS(lParam);
 			break;
 		}
 		case WM_RBUTTONUP:
 		{
 			mouse.OnRMBReleased();
-			const POINTS pt = MAKEPOINTS(lParam);
 			break;
 		}
 		case WM_RBUTTONDOWN:
 		{
 			mouse.OnRMBPressed();
-			const POINTS pt = MAKEPOINTS(lParam);
 			break;
 		}
 		case WM_MOUSEWHEEL:
 		{
 			const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
 			mouse.OnWheelDelta(delta);
-			const POINTS pt = MAKEPOINTS(lParam);
+			//const POINTS pt = MAKEPOINTS(lParam);
 			break;
 		}
 	}

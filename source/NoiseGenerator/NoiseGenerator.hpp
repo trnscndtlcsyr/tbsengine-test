@@ -2,15 +2,19 @@
 #include <vector>
 #include <string>
 
-#include "Biome.h"
-#include "PerlinNoise.h"
-#include "VoronoiDiagram.h"
+#include "Biome.hpp"
+#include "PerlinNoise.hpp"
+#include "VoronoiDiagram.hpp"
 
 class NoiseGenerator
 {
     struct Vector2
     { 
-        Vector2() : x(0.0f), y(0.0f) {}
+        Vector2() 
+            : 
+            x{ 0.0f }, 
+            y{ 0.0f } 
+        {}
         float x, y; 
     };
 
@@ -18,10 +22,10 @@ class NoiseGenerator
     {
         FractalPerlinParam(float frequency, float amplitude, float persistence, float lacunarity)
             :
-            frequency(frequency),
-            amplitude(amplitude),
-            persistence(persistence),
-            lacunarity(lacunarity)
+            frequency{ frequency },
+            amplitude{ amplitude },
+            persistence{ persistence },
+            lacunarity{ lacunarity }
         {}
     public:
         float frequency;

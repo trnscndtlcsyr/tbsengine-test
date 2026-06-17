@@ -1,5 +1,5 @@
-#include "NoiseGenerator.h"
-#include "PerlinNoise.h"
+#include "NoiseGenerator.hpp"
+#include "PerlinNoise.hpp"
 #include <random>
 #include <iostream>
 #include <fstream>
@@ -7,11 +7,11 @@
 
 NoiseGenerator::NoiseGenerator() 
     : 
-    globalSeed(0),
-    noise(globalSeed), 
-    voronoi(globalSeed, vParam.spaceScale), 
-    voronoiRiver(globalSeed, vParam.riverScale),
-    fpParam(1.0f, 1.0f, 0.5f, 2.0f)
+    globalSeed{ 0 },
+    noise{ globalSeed },
+    voronoi{globalSeed, vParam.spaceScale}, 
+    voronoiRiver{ globalSeed, vParam.riverScale },
+    fpParam{ 1.0f, 1.0f, 0.5f, 2.0f }
 {
     //std::random_device rd;
     //unsigned int seed = rd();

@@ -31,19 +31,19 @@ public:
 	public:
 		Event() noexcept
 			:
-			type(Type::Invalid),
-			lmbIsPressed(false),
-			rmbIsPressed(false),
-			wheelIsPressed(false),
-			x(0.0f), y(0.0f)
+			type{ Type::Invalid },
+			lmbIsPressed{ false },
+			rmbIsPressed{ false },
+			wheelIsPressed{ false },
+			x{ 0.0f }, y{ 0.0f }
 		{}
 		Event(Type type, const Mouse& parent) noexcept
 			:
-			type(type), 
-			lmbIsPressed(parent.lmbIsPressed),
-			rmbIsPressed(parent.rmbIsPressed),
-			wheelIsPressed(parent.wheelIsPressed),
-			x(parent.x), y(parent.y)
+			type{ type },
+			lmbIsPressed{ parent.lmbIsPressed },
+			rmbIsPressed{ parent.rmbIsPressed },
+			wheelIsPressed{ parent.wheelIsPressed },
+			x{ parent.x }, y{ parent.y }
 		{}
 		bool IsValid() const noexcept { return type != Type::Invalid; }
 		Type GetType() const noexcept { return type; }
@@ -54,6 +54,7 @@ public:
 		bool RightIsPressed() const noexcept { return rmbIsPressed; }
 		bool WheelIsPressed() const noexcept { return wheelIsPressed; }
 	};
+
 
 	Mouse() = default;
 	Mouse(const Mouse&) = delete;
@@ -91,5 +92,6 @@ private:
 };
 
 using mouseEvents_t = Mouse::Event::Type;
+
 
 

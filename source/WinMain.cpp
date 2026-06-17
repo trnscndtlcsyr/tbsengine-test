@@ -1,6 +1,7 @@
-#include "Engine/Core.h"
-#include "Engine/WinException.h"
-#include "Application.h"
+#include "Engine/Core.hpp"
+#include "Engine/WinException.hpp"
+#include "Application.hpp"
+#include "nlohmann/json.hpp"
 
 int CALLBACK wWinMain(
 	_In_ HINSTANCE hInstance, 
@@ -16,6 +17,15 @@ int CALLBACK wWinMain(
 	catch (WinException& se)
 	{
 		MessageBoxEx(nullptr, se.wwhat(), L"Windows Exception", MB_OK | MB_ICONEXCLAMATION, 0);
+	}
+	catch (const nlohmann::json::parse_error& e) {
+
+		std::wstring errorMsg = WinException::Utf8ToWide(e.what());
+		MessageBoxEx(nullptr, errorMsg.c_str(), L"JSON Parse Error", MB_OK | MB_ICONEXCLAMATION, 0);
+	}
+	catch (const nlohmann::json::type_error& e) {
+		std::wstring errorMsg = WinException::Utf8ToWide(e.what());
+		MessageBoxEx(nullptr, errorMsg.c_str(), L"JSON Type Error", MB_OK | MB_ICONEXCLAMATION, 0);
 	}
 	catch (std::exception& ex)
 	{

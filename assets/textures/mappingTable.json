@@ -1,0 +1,29 @@
+{
+  "table": {
+    "textures/tex_test.png":  "None",
+    "textures/tex_test_abyss.png":  "Abyss",
+    "textures/tex_test_ocean.png": "Ocean",
+    "textures/tex_test_iceLand.png": "IceLand",
+    "textures/tex_test_shore.png": "Shore",
+    "textures/tex_test_snowyShore.png": "SnowyShore",
+    "textures/tex_test_plains.png": "Plains",
+    "textures/tex_test_fireLand.png": "FireLand",
+    "textures/tex_test_forest.png": "Forest",
+    "textures/tex_test_tundra.png": "Tundra",
+    "textures/tex_test_desert.png": "Desert",
+    "textures/tex_test_grassyHill.png": "GrassyHill",
+    "textures/tex_test_forestHill.png": "ForestHill",
+    "textures/tex_test_muddyHill.png": "MuddyHill",
+    "textures/tex_test_dryHill.png": "DryHill",
+    "textures/tex_test_snowyHill.png": "SnowyHill",
+    "textures/tex_test_desertDunes.png": "DesertDunes",
+    "textures/tex_test_volcano.png": "Volcano",
+    "textures/tex_test_rockyMountain.png": "RockyMountain",
+    "textures/tex_test_iceMountain.png": "IceMountain",
+    "textures/tex_test_swamp.png": "Swamp",
+    "textures/tex_test_rainForest.png": "RainForest",
+    "textures/tex_test_dryLand.png": "DryLand",
+    "textures/tex_test_savannah.png": "Savannah",
+    "textures/tex_test_geyserLand.png": "GeyserLand"
+  }
+}

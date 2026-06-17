@@ -1,4 +1,4 @@
-#include "Tile.h"
+#include "Tile.hpp"
 
 D2D1_POINT_2F Tile::OrthoToIso(int orthoX, int orthoY, int width, int height)
 {

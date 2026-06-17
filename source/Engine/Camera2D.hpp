@@ -1,14 +1,10 @@
 #pragma once
-#include "Transform.h"
+#include "Transform.hpp"
 
 class Camera2D
 {
 public:
-	Camera2D()
-		:
-		x(0.0f),
-		y(0.0f)
-	{}
+	Camera2D() = default;
 	void setCameraView(Transform& transform, float w, float h);
 	D2D1_RECT_F getView() { return view; }
 	bool viewCulling(const D2D1_POINT_2F& pos, const D2D1_POINT_2F& size);
