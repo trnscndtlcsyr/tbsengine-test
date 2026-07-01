@@ -1,7 +1,6 @@
 #pragma once
 #include "GameTypes.hpp"
-#include "../Engine/Sprite.hpp"
-#include "../Engine/AtlasData.hpp"
+#include <Engine/AtlasData.hpp>
 
 class TileProfile
 {

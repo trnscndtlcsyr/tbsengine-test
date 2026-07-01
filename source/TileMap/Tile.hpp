@@ -3,8 +3,6 @@
 #include<d2d1_1helper.h>
 #include<d2d1_1.h>
 #include<memory>
-
-#include "..\Engine\Texture2D.hpp"
 #include "GameTypes.hpp"
 
 class Tile

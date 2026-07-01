@@ -1,5 +1,5 @@
 #pragma once
-#include "../TIleMap/GameTypes.hpp"
+#include <TileMap/GameTypes.hpp>
 
 class Range
 {

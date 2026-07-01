@@ -1,4 +1,3 @@
-#include "Engine/Core.hpp"
 #include "Engine/WinException.hpp"
 #include "Application.hpp"
 #include "nlohmann/json.hpp"

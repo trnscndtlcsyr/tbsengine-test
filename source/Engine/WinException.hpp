@@ -1,6 +1,6 @@
 #pragma once
 
-#include <comdef.h>>
+#include <comdef.h>
 #include <system_error>
 #include <source_location>
 #include <sstream>

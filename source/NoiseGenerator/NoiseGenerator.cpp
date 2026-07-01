@@ -48,6 +48,14 @@ std::vector<Biome> NoiseGenerator::generateBiomesMap(int width, int height, floa
     return biomeMap;
 }
 
+std::vector<float> NoiseGenerator::generateHeights(int width, int height, float offsetX, float offsetY)
+{
+    std::vector<float> continentalnessMap = continentalnessGeneration(width, height, offsetX, offsetY);
+    std::vector<float> erosionMap = erosionGeneration(width, height, offsetX, offsetY);
+    std::vector<float> heightMap = heightGeneration(width, height, offsetX, offsetY, continentalnessMap, erosionMap);
+    return heightMap;
+}
+
 std::vector<Biome> NoiseGenerator::setBiomes()
 {
     std::vector<Biome> biomes;

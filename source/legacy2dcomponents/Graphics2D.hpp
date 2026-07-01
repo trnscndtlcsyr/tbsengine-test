@@ -13,15 +13,17 @@
 #include<d2d1_3.h>
 #include<d2d1_1helper.h>
 #include<wincodec.h>
+#include <string>
 
 #include "Texture2D.hpp"
 #include "Transform.hpp"
 
+
+template<typename T> using comPtr = Microsoft::WRL::ComPtr<T>;
+using comPtrBrush = comPtr<ID2D1SolidColorBrush>;
+
 class Graphics2D
 {
-public:
-	template<typename T> using comPtr = Microsoft::WRL::ComPtr<T>;
-	using comPtrBrush = comPtr<ID2D1SolidColorBrush>;
 public:
 	Graphics2D(HWND hWnd);
 	Graphics2D(const Graphics2D&) = delete;
@@ -29,18 +31,24 @@ public:
 	~Graphics2D() = default;
 	void RenderStartAndClear(float r, float g, float b, float a);
 	void RenderEnd();
+	void RenderSwap();
 	void RenderResize(UINT width, UINT height);
-	void DrawSpriteFromAtlas(Texture2D& texAtlas, const D2D1_RECT_F& dst, const D2D1_RECT_F& srcDst) const;
+	void DrawSpriteFromAtlas(const Texture2D& texAtlas, const D2D1_RECT_F& dst, const D2D1_RECT_F& srcDst) const;
 	void DrawTexture2D(Texture2D& texture, const D2D1_RECT_F& dst) const;
 	void DrawRectangle2D(const D2D1_RECT_F& rect, const comPtrBrush& brush) const;
 	void DrawLine2D(const D2D1_POINT_2F& start, const D2D1_POINT_2F& end, const comPtrBrush& brush) const;
-	void DrawText2D(const WCHAR* text, const D2D1_RECT_F& dst, const comPtrBrush& brush);
+	void DrawText2D(const std::wstring& text, const D2D1_RECT_F& dst, const comPtrBrush& brush);
 	void Translate(Transform& transform,const D2D1_POINT_2F& move);
 	void Scale(Transform& transform,const D2D1_POINT_2F& view, float scaleFactor);
 	void ApplyTransform(Transform& transform);
-	const D2D1_SIZE_F GetRenderContextSize() const { return pD2d1Context->GetSize(); }
-	ID2D1DeviceContext* getDeviceContext2D() const { return pD2d1Context.Get(); }
+	const D2D1_SIZE_F getContextSize() const { return pD2d1Context->GetSize(); }
+public:
+	ID2D1DeviceContext* getID2D1DeviceContext() const { return pD2d1Context.Get(); }
 	IWICImagingFactory2* getIWICImagingFactory2() const { return pWICFactory2.Get(); }
+	ID3D11Device* getID3D11Device() const { return pD3d11Device.Get(); }
+	ID3D11DeviceContext* getID3D11DeviceContext() const { return pD3d11Context.Get(); }
+	IDXGIDevice3* getIDXGIDevice3() const { return pDxgiDevice3.Get(); }
+	ID2D1Device* getID2D1Device() const { return pD2d1Device.Get(); }
 private:
 	void DX3D11_CreateDeviceAndContext(D3D11_CREATE_DEVICE_FLAG creationFlags);
 	void ExtractDXGIDevice();

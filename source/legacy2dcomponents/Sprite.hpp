@@ -5,9 +5,7 @@
 
 class Sprite {
 public:
-	Sprite(AtlasData::SpriteData d)
-		:
-		data{ d }
+	Sprite(AtlasData::SpriteData d) : data{ d }
 	{}
 private:
 	AtlasData::SpriteData data;

@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include "../TileMap/GameTypes.hpp"
+#include <TileMap/GameTypes.hpp>
 
 namespace AtlasData
 {

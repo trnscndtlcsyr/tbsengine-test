@@ -1,4 +1,6 @@
 #include "WinException.hpp"
+#include <string>
+#include <format>
 
 WinException::WinException(
 	HRESULT hr,
@@ -12,15 +14,9 @@ WinException::WinException(
 	std::wstring wFunc = Utf8ToWide(loc.function_name());
 	std::wstring wExpr = Utf8ToWide(expr);
 	std::wstring wDesc = Utf8ToWide(std::system_error::what());
-
-	std::wstringstream wss;
-	wss << "\n[WinAPI/DX Error]\n"
-		<< "Expression: " << wExpr << "\n"
-		<< "File:       " << wFile << "\n"
-		<< "Line:       " << loc.line() << "\n"
-		<< "Function:   " << wFunc << "\n"
-		<< "Description: " << wDesc << "\n";
-	w_message = wss.str();
+	w_message = std::format(
+		L"[WinAPI/DX Error]\nExpression: {}\nFile: {}\nLine: {}\nFunction: {}\nDescription: {}",
+		wExpr, wFile, loc.line(), wFunc, wDesc);
 }
 
 

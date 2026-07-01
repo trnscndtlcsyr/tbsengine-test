@@ -1,6 +1,7 @@
 #include "Graphics2D.hpp"
-#include "Core.hpp"
-#include "WinException.hpp"
+
+#include<Engine/Core.hpp>
+#include<Engine/WinException.hpp>
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d2d1.lib")
@@ -243,7 +244,7 @@ void Graphics2D::DX2D_SetContextTarget()
 /// Create windows imaging component factory, com init and create com 
 /// instance with CLSID_WICImagingFactory param
 /// </summary>
-Graphics2D::comPtr<IWICImagingFactory2> Graphics2D::CreateWICFactory()
+comPtr<IWICImagingFactory2> Graphics2D::CreateWICFactory()
 {
 	comPtr<IWICImagingFactory2> pWICFactory2;
 	DX_CHECK(CoInitialize(nullptr));
@@ -256,7 +257,7 @@ Graphics2D::comPtr<IWICImagingFactory2> Graphics2D::CreateWICFactory()
 	return pWICFactory2;
 }
 
-Graphics2D::comPtrBrush Graphics2D::CreateBrush(D2D1::ColorF color)
+comPtrBrush Graphics2D::CreateBrush(D2D1::ColorF color)
 {
 	if (pD2d1Context) {
 		D2D1_COLOR_F colorf = D2D1::ColorF(color);
@@ -276,7 +277,7 @@ void Graphics2D::DrawTexture2D(Texture2D& texture, const D2D1_RECT_F& dst) const
 }
 
 void Graphics2D::DrawSpriteFromAtlas(
-	Texture2D& texAtlas, 
+	const Texture2D& texAtlas, 
 	const D2D1_RECT_F& dst, 
 	const D2D1_RECT_F& srcDst
 ) const
@@ -299,13 +300,12 @@ void Graphics2D::DrawLine2D(const D2D1_POINT_2F& start, const D2D1_POINT_2F& end
 	pD2d1Context->DrawLine(start, end, brush.Get());
 }
 
-void Graphics2D::DrawText2D(const WCHAR* text, const D2D1_RECT_F& dst, const comPtrBrush& brush)
+void Graphics2D::DrawText2D(const std::wstring& text, const D2D1_RECT_F& dst, const comPtrBrush& brush)
 {
 	if (pD2d1Context) {
-		UINT32 cTextLength = static_cast<UINT32>(wcslen(text));
 		pD2d1Context->DrawText(
-			text, 
-			cTextLength, 
+			text.c_str(),
+			static_cast<UINT32>(text.size()),
 			pTextFormat3.Get(), 
 			dst, 
 			brush.Get()
@@ -323,6 +323,10 @@ void Graphics2D::RenderStartAndClear(float r, float g, float b, float a = 1.0f)
 void Graphics2D::RenderEnd()
 {
 	DX_CHECK(pD2d1Context->EndDraw());
+}
+
+void Graphics2D::RenderSwap()
+{
 	UINT synchFlag = IsFullScreen ? 1 : 0;
 	DX_CHECK(pSwapChain3->Present(synchFlag, 0));
 }

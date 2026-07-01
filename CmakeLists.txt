@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 
-# принудительный запуск скачивания пакетов vcpkg
+set(VCPKG_MANIFEST_MODE ON)
 set(VCPKG_MANIFEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 project(DXD2Engine CXX)
 
-# Предотвращаем сборку на не-Windows системах
 if(NOT WIN32)
     message(FATAL_ERROR "DirectX поддерживается только на ОС Windows!")
 endif()
@@ -16,45 +15,100 @@ if(MSVC)
     add_compile_options(/Od /Zi)
 endif()
 
-# поддержка Unicode
 add_compile_definitions(UNICODE _UNICODE)
 
-# Включаем современный стандарт C++
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(imgui CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
-# Автоматически находим все файлы исходного кода (.cpp) и заголовков (.h)
-file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" 
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" 
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.hlsl"
+include(FetchContent)
+
+FetchContent_Declare(
+    stb_official
+    GIT_REPOSITORY https://github.com/nothings/stb.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(stb_official)
+
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/stb_image_impl.cpp" "
+#define STBI_NO_PSD 
+#define STBI_NO_TGA 
+#define STB_IMAGE_IMPLEMENTATION 
+#include \"stb_image.h\"")
+
+add_library(STB STATIC "${CMAKE_CURRENT_BINARY_DIR}/stb_image_impl.cpp")
+
+target_include_directories(STB PUBLIC 
+"${stb_official_SOURCE_DIR}")
+
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG v1.90.8
+)
+FetchContent_MakeAvailable(imgui)
+
+#set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/imgui")
+
+add_library(EngineImGui  STATIC
+    "${imgui_SOURCE_DIR}/imgui.cpp"
+    "${imgui_SOURCE_DIR}/imgui_draw.cpp"
+    "${imgui_SOURCE_DIR}/imgui_tables.cpp"
+    "${imgui_SOURCE_DIR}/imgui_widgets.cpp"
+    "${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp"
+    "${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp")
+
+target_include_directories(EngineImGui PUBLIC
+    "${imgui_SOURCE_DIR}"
+    "${imgui_SOURCE_DIR}/backends"
 )
 
-# Создаем исполняемый файл
+target_compile_definitions(EngineImGui PUBLIC IMGUI_USER_CONFIG="imconfig.h")
+
+#set(VS_SHADER_SOURCE  "${CMAKE_CURRENT_SOURCE_DIR}/source/Shaders/VertexShader.hlsl")
+#set(PS_SHADER_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/source/Shaders/PixelShader.hlsl")
+
+#set_source_files_properties(${VS_SHADER_SOURCE} PROPERTIES VS_TOOL_OVERRIDE "FxCompile" VS_SHADER_TYPE "Vertex" VS_SHADER_MODEL "5.0" VS_SHADER_ENTRYPOINT "main" VS_SHADER_OUTPUT_HEADER_FILE "")
+
+#set_source_files_properties(${VS_SHADER_SOURCE} PROPERTIES VS_TOOL_OVERRIDE "FxCompile"  VS_SHADER_TYPE "Pixel" VS_SHADER_MODEL "5.0" VS_SHADER_ENTRYPOINT "main" VS_SHADER_OUTPUT_HEADER_FILE "")
+
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/*.hlsl"
+)
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
-
-# Подключаем системные библиотеки DirectX из Windows SDK.
-# В VS вы прописывали их в свойствах линкера, здесь — одной командой.
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    d3d11.lib 
-    dxgi.lib
-    d3dcompiler.lib
-    imgui::imgui
-    nlohmann_json::nlohmann_json
+target_include_directories(${PROJECT_NAME} PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/source"
+    "${imgui_SOURCE_DIR}"
+    "${imgui_SOURCE_DIR}/backends"
+    "${stb_official_SOURCE_DIR}"
 )
 
-# Настройка для Win32, чтобы при запуске не открывалась консоль
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    d3d11.lib
+    dxgi.lib
+    d3dcompiler.lib
+    nlohmann_json::nlohmann_json
+    EngineImGui
+    STB
+)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/assets/textures"   # Новый путь в корне проекта
-    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/textures"   # Старый путь рядом с .exe
-    COMMENT "Копирование textures из папки assets в директорию сборки..."
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_SOURCE_DIR}/assets" 
+    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets"
+)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/shaders/VertexShader.hlsl"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets/shaders/VertexShader.hlsl"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets/shaders/PixelShader.hlsl"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets/shaders/PixelShader.hlsl"
 )

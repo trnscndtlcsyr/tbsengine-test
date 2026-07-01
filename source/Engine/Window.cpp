@@ -1,22 +1,25 @@
 #include "Window.hpp"
 #include "WinException.hpp"
+#include <imgui_impl_win32.h>
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 void Window::InitWindowClass()
 {
-	WNDCLASSEX wc = { 0 };
-	wc.cbSize = sizeof(wc);
-	wc.style = CS_OWNDC;
-	wc.lpfnWndProc = MsgSetup;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = hInstance;
-	wc.lpszClassName = class_name;
-	wc.hIcon = nullptr;
-	wc.hCursor = nullptr;
-	wc.hbrBackground = nullptr;
-	wc.lpszMenuName = nullptr;
-	wc.hIconSm = nullptr;
-
+	WNDCLASSEX wc = {
+	.cbSize = sizeof(WNDCLASSEX),
+	.style = CS_HREDRAW | CS_VREDRAW,
+	.lpfnWndProc = MsgSetup,
+	.cbClsExtra = 0,
+	.cbWndExtra = 0,
+	.hInstance = hInstance,
+	.hIcon = nullptr,
+	.hCursor = nullptr,
+	.hbrBackground = nullptr,
+	.lpszMenuName = nullptr,
+	.lpszClassName = class_name,
+	.hIconSm = nullptr
+	};
 	WIN_CHECK(RegisterClassEx(&wc));
 }
 
@@ -44,7 +47,7 @@ Window::Window(UINT width, UINT height, const wchar_t* name) : width{ width }, h
 	);
 	WIN_CHECK(hWnd);
 	ShowWindow(hWnd, SW_SHOWDEFAULT);
-	pRenderer = std::make_unique<Graphics2D>(hWnd);
+	pRenderer = std::make_unique<RenderPipeline>(hWnd);
 }
 
 Window::~Window()
@@ -68,7 +71,7 @@ int Window::MessageProcessing()
 	return 1;
 }
 
-Graphics2D& Window::gfx()
+RenderPipeline& Window::gfx()
 {
 	WIN_CHECK(pRenderer);
 	return *pRenderer;
@@ -79,7 +82,7 @@ void Window::OnResize(UINT w, UINT h)
 	width = w;
 	height = h;
 	if (pRenderer.get()) {
-		pRenderer->RenderResize(w, h);
+		//pRenderer->RenderResize(w, h);
 	}
 }
 
@@ -107,6 +110,7 @@ LRESULT WINAPI Window::MsgProcReplace(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 //основная машина сообщение
 LRESULT Window::HandleMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam)) return true;
 	switch (uMsg)
 	{
 		case WM_CLOSE:
@@ -117,6 +121,11 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) no
 			UINT width = LOWORD(lParam);
 			UINT height = HIWORD(lParam);
 			OnResize(width, height);
+			break;
+		}
+		case WM_PAINT:
+		{
+			ValidateRect(hWnd, nullptr);
 			break;
 		}
 		case WM_MOUSEMOVE:

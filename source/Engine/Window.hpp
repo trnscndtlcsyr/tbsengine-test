@@ -4,8 +4,8 @@
 #include<string>
 #include<sstream>
 
-#include "Graphics2D.hpp"
 #include "Mouse.hpp"
+#include "RenderPipeline.hpp"
 
 class Window
 {
@@ -15,7 +15,8 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 	int MessageProcessing();
-	Graphics2D& gfx();
+	RenderPipeline& gfx();
+	HWND getHandle() const { return hWnd; }
 	std::pair<UINT, UINT> GetSize() { return { width, height }; }
 private:
 	void TextPost(HWND hWnd, const POINTS pt, const char* text);
@@ -33,7 +34,7 @@ private:
 	static constexpr const wchar_t* class_name = L"DX2D";
 	HWND hWnd;
 	HINSTANCE hInstance;
-	std::unique_ptr<Graphics2D> pRenderer;
+	std::unique_ptr<RenderPipeline> pRenderer;
 	bool fullScreenState = false;
 	RECT windowRect;
 	static const UINT windowStyle = WS_OVERLAPPEDWINDOW;

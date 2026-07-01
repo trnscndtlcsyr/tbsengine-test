@@ -2,7 +2,6 @@
   "name": "my-directx-game",
   "version-string": "0.1.0",
   "dependencies": [
-    "imgui",
     "nlohmann-json"
   ]
 }

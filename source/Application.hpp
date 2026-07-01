@@ -1,16 +1,16 @@
 #pragma once
+#include <string>
+#include <string_view>
 
-#include "../source/Engine/Window.hpp"
-#include "../source/Engine/Timer.hpp"
-#include "../source/TileMap/Chunk.hpp"
-#include "../source/TileMap/ChunkMap.hpp"
-#include "../source/TileMap/TileProfile.hpp"
-#include "Engine/Camera2D.hpp"
-#include "Engine/ResourceManager.hpp"
-#include "Engine/AtlasData.hpp"
-
-#include<string>
-#include<sstream>
+#include <TileMap/Chunk.hpp>
+#include <TileMap/ChunkMap.hpp>
+#include <TileMap/TileProfile.hpp>
+#include <Engine/Window.hpp>
+#include <Engine/Timer.hpp>
+#include <Engine/AtlasData.hpp>
+#include <Engine/ImguiWrapper.hpp>
+#include <Engine/Camera.hpp>
+#include <Engine/Terrain.hpp>
 
 class Application
 {
@@ -26,24 +26,28 @@ private:
 	void FrameRender();
 	void SystemUpdate();
 private:
-	void DrawCollision(const D2D1_RECT_F rect, const Graphics2D::comPtrBrush& brush);
 	void DrawTile(const Tile& tile);
-	void DrawTextInfo(const WCHAR* text, const D2D1_RECT_F dst);
+	//void DrawCollision(const D2D1_RECT_F rect, const comPtrBrush& brush);
+	//void DrawTextInfo(const std::wstring& text, const D2D1_RECT_F dst);
 private:
-	ResourceManager resManager;
-	Texture2D atlas;
 	Window wnd;
 	Timer timer;
-	Transform transform;
-	Camera2D cam;
 	std::unique_ptr<ChunkMap> chunkMap;
 	std::vector<TileProfile> tileProfiles;
-	int error;
-	Graphics2D::comPtrBrush pTextBrush = nullptr;
-	Graphics2D::comPtrBrush pCollisionBrush = nullptr;
 private:
+	Terrain terrain;
+	//ImguiWrapper wrapper;
+private:
+	//obsolete
+	/*ResourceManager resManager;
+	Transform transform;
+	Camera2D cam;
+	Texture2D* pAtlas;
+	comPtrBrush pTextBrush = nullptr;
+	comPtrBrush pCollisionBrush = nullptr;*/
+private:
+	int error;
 	std::pair<int, int> mapSize;
 	std::pair<int, int> currentPos;
 	std::pair<int, int> previousPos;
-	std::wostringstream wss;
 };
