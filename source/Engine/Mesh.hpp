@@ -66,6 +66,7 @@ public:
 private:
 	std::vector<Vertex3D> GenerateVertices(uint32_t width, uint32_t depth) override;
 	std::vector<uint32_t> GenerateIndices(uint32_t width, uint32_t depth) override;
+	DirectX::XMFLOAT3 CalculateNormal(float heightLeft, float heightRight, float heightDown, float heightUp, float step);
 private:
 	std::vector<Vertex3D> vertices;
 	std::vector<uint32_t> indices;

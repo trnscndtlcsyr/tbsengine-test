@@ -34,6 +34,7 @@ struct RenderHandle {
 	TextureHandle shadowmapth;
 	RasterizerStateHandle shadowrsh;
 	SamplerStateHandle shadowssh;
+	ConstantBufferHandle lightpixelcbh;
 };
 
 enum class ShaderType { Vertex, Pixel, Compute };

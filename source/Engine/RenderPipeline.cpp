@@ -14,6 +14,8 @@ void RenderPipeline::Initialize(float width, float height)
 
 	cam.SetProjection(ProjectionType::Perspective, width, height);
 	cam.SetPosition(0.0f, 20.0f, -50.0f);
+	dirLight.SetPosition(30.0f, 15.0f, 0.0f);
+	dirLight.SetDirection(0.0f, 0.0f, 0.0f);
 }
 
 void RenderPipeline::CreateResources(Mesh& mesh)
@@ -27,7 +29,8 @@ void RenderPipeline::CreateResources(Mesh& mesh)
 
 	std::vector<VertexElement> schema {
 		{"POSITION", 0, VertexFormat::float3, 0, 0},
-		{"COLOR", 0, VertexFormat::float4, 0, 12}
+		{"COLOR", 0, VertexFormat::float4, 0, 12},
+		{"NORMAL", 0, VertexFormat::float3, 0, 28}
 	};
 	ShaderHandle shadowVSHandle = dxhal->CreateAndCompileShaderFromFile(
 		L"assets/shaders/ShadowVertexShader.hlsl",
@@ -55,9 +58,10 @@ void RenderPipeline::CreateResources(Mesh& mesh)
 	ConstantBufferHandle cameraCBuffer = dxhal->CreateConstantBuffer(size_xmmatrix);
 	ConstantBufferHandle objectCBuffer = dxhal->CreateConstantBuffer(size_xmmatrix);
 	ConstantBufferHandle lightCBuffer = dxhal->CreateConstantBuffer(size_xmmatrix);
+	ConstantBufferHandle lightCPixelBuffer = dxhal->CreateConstantBuffer(size_lightbuffer);
 
 	TextureHandle shadowMapHandle = dxhal->CreateShadowMapTexture(
-		static_cast<uint32_t>(1024), 
+		static_cast<uint32_t>(1024),
 		static_cast<uint32_t>(1024));
 	rh = {
 		.rsh = rasterizerHandle,
@@ -73,12 +77,14 @@ void RenderPipeline::CreateResources(Mesh& mesh)
 		.lightcbh = lightCBuffer,
 		.shadowmapth = shadowMapHandle,
 		.shadowrsh = shadowRasterizerHandle,
-		.shadowssh = shadowSamplerHandle
+		.shadowssh = shadowSamplerHandle,
+		.lightpixelcbh = lightCPixelBuffer
 	};
 }
 
 void RenderPipeline::Render(Object3D& object)
 {
+	dirLight.SetPosition(textX -= 0.1f, 15.0f, 0.);
 	DirectX::XMMATRIX cameraMatrix = cam.GetViewProjectionMatrix();
 	dxhal->UpdateConstantBuffer(rh.camerabh, &cameraMatrix, size_xmmatrix);
 	DirectX::XMMATRIX lightMatrix = dirLight.GetLightSpaceMatrix();
@@ -120,6 +126,12 @@ void RenderPipeline::Render(Object3D& object)
 	dxhal->BindConstantBuffer(rh.camerabh, 0, ShaderType::Vertex);
 	dxhal->BindConstantBuffer(rh.objectbh, 1, ShaderType::Vertex);
 	dxhal->BindConstantBuffer(rh.lightcbh, 2, ShaderType::Vertex);
+	LightBuffer lb;
+	DirectX::XMStoreFloat3(&lb.lightDir, dirLight.GetLightDirection());
+	lb.padding = 0.0f;
+	dxhal->UpdateConstantBuffer(rh.lightpixelcbh, &lb, size_lightbuffer);
+	dxhal->BindConstantBuffer(rh.lightpixelcbh, 0, ShaderType::Pixel);
+
 
 	dxhal->BindTexture(1, rh.shadowmapth);
 	dxhal->BindSamplerState(1, rh.shadowssh);

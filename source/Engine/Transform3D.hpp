@@ -11,6 +11,7 @@ public:
 	{}
 	~Transform3D() = default;
 	void SetPosition(float x, float y, float z) { position = { x, y, z }; }
+	DirectX::XMFLOAT3 GetPosition() const { return position; }
 	void SetRotationX(float angle) { rotation.x = angle; }
 	void SetRotationY(float angle) { rotation.y = angle; }
 	void SetRotationZ(float angle) { rotation.z = angle; }

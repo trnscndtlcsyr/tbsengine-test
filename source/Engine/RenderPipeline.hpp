@@ -17,4 +17,5 @@ private:
 	RenderHandle rh;
 	TextureHandle th;
 	std::unique_ptr<DX11RenderDevice> dxhal;
+	float textX = 0.0f;
 };

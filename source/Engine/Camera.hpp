@@ -1,5 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
+#include "Object3D.hpp"
 
 enum class ProjectionType {
 	Perspective, Otrhographic
@@ -12,10 +13,10 @@ public:
 public:
 	void SetPosition(float x, float y, float z);
 	void SetProjection(ProjectionType type, float width, float height);
-
+	DirectX::XMMATRIX GetRotation() const;
 	DirectX::XMMATRIX GetViewProjectionMatrix() const;
 private:
-	DirectX::XMFLOAT3 position;
+	Transform3D transform;
 	DirectX::XMMATRIX viewMatrix;
 	DirectX::XMMATRIX projectionMatrix;
 };

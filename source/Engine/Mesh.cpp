@@ -50,10 +50,16 @@ std::vector<Vertex3D> NoisePlane::GenerateVertices(uint32_t width, uint32_t dept
 			Vertex3D v;
 			int index = z * width + x;
 			float noise = noiseMap.at(index) / 255.0f;
+			noise *= 2.0f;
 			v.pos.x = static_cast<float>(x);
 			v.pos.z = static_cast<float>(z);
 			v.pos.y = noise;
-			v.col = { 0.5f, 0.5f, 0.5f, 1.0f };
+			v.col = { 0.9f, 0.9f, 0.9f, 1.0f };
+			float hL = (x > 0) ? noiseMap.at(z * width + (x - 1)) / 255.0f : noise;
+			float hR = (x < width - 1) ? noiseMap.at(z * width + (x + 1)) / 255.0f : noise;
+			float hD = (z > 0) ? noiseMap.at((z - 1) * width + x) / 255.0f : noise;
+			float hU = (z < depth - 1) ? noiseMap.at((z + 1) * width + x) / 255.0f : noise;
+			v.normal = CalculateNormal(hL, hR, hD, hU, 1.0f);
 			vertices.push_back(v);
 		}
 	}
@@ -75,9 +81,18 @@ std::vector<uint32_t> NoisePlane::GenerateIndices(uint32_t width, uint32_t depth
 			indices.push_back(bottomLeft);
 
 			indices.push_back(bottomLeft);
-			indices.push_back(bottomRight);
 			indices.push_back(topRight);
+			indices.push_back(bottomRight);
 		}
 	}
 	return indices;
+}
+
+DirectX::XMFLOAT3 NoisePlane::CalculateNormal(float heightLeft, float heightRight, float heightDown, float heightUp, float step)
+{
+	DirectX::XMVECTOR vNormal = DirectX::XMVectorSet(heightLeft - heightRight, 2.0f * step, heightDown - heightUp, 0.0f);
+	vNormal = DirectX::XMVector3Normalize(vNormal);
+	DirectX::XMFLOAT3 normal;
+	DirectX::XMStoreFloat3(&normal, vNormal);
+	return normal;
 }

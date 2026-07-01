@@ -191,9 +191,9 @@ RasterizerStateHandle DX11RenderDevice::CreateRasterizerState(RasterizerParam rP
 {
 	D3D11_RASTERIZER_DESC rsDesc{
 		.FillMode = D3D11_FILL_SOLID,
-		.CullMode = D3D11_CULL_NONE,
+		.CullMode = (rParam == RasterizerParam::Default ? D3D11_CULL_NONE : D3D11_CULL_FRONT),
 		.FrontCounterClockwise = FALSE,
-		.DepthBias = (rParam == RasterizerParam::Default ? 0 : 1000),
+		.DepthBias = (rParam == RasterizerParam::Default ? 0 : 10000),
 		.DepthBiasClamp = (rParam == RasterizerParam::Default ? 0.0f : 0.0f),
 		.SlopeScaledDepthBias = (rParam == RasterizerParam::Default ? 0.0f : 1.5f),
 		.DepthClipEnable = TRUE,
@@ -526,13 +526,13 @@ comPtr<ID3DBlob> DX11RenderDevice::CompileShader(
 	std::string shaderCode = buffer.str();
 	file.close();
 
-	// 3. ОЧИСТКА ОТ BOM (Если в начале файла есть байты EF BB BF - отрезаем)
+	//ОЧИСТКА ОТ BOM (Если в начале файла есть байты EF BB BF)
 	if (shaderCode.size() >= 3 &&
 		(unsigned char)shaderCode[0] == 0xEF &&
 		(unsigned char)shaderCode[1] == 0xBB &&
 		(unsigned char)shaderCode[2] == 0xBF)
 	{
-		shaderCode = shaderCode.substr(3); // Удаляем первые 3 невидимых байта
+		shaderCode = shaderCode.substr(3); //Удаляем первые 3 невидимых байта
 	}
 	comPtr<ID3DBlob> shaderBlob;
 	comPtr<ID3DBlob> errorBlob;
@@ -639,7 +639,7 @@ InputLayoutHandle DX11RenderDevice::CreateInputLayoutBySchema(
 	ID3DBlob* blob = shaders[vsHandle.id - 1].pBlob.Get();
 	InputLayoutHandle layoutHandle = CreateInputLayout(
 		schema.data(), 
-		2,
+		3,
 		blob->GetBufferPointer(),
 		blob->GetBufferSize()
 	);
@@ -668,7 +668,7 @@ void DX11RenderDevice::Initialize(float width, float height)
 void DX11RenderDevice::ClearColor(TextureHandle handle)
 {
 	if (!handle.isValid()) return;
-	const FLOAT color[4] = { 0.7f, 0.7f, 0.7f, 1.0f };
+	const FLOAT color[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
 	pD3d11Context->ClearRenderTargetView(
 		textures[handle.id - 1].pRTV.Get(),
 		color

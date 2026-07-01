@@ -4,14 +4,17 @@
 struct Vertex3D {
 	DirectX::XMFLOAT3 pos;
 	DirectX::XMFLOAT4 col;
+	DirectX::XMFLOAT3 normal;
 };
 
-struct LightBufferData {
-	DirectX::XMMATRIX lightSpaceMatrix;
+struct LightBuffer {
+	DirectX::XMFLOAT3 lightDir;
+	float padding;
 };
 
 static uint32_t size_vertex3d = sizeof(Vertex3D);
 static uint32_t size_xmmatrix = sizeof(DirectX::XMMATRIX);
+static uint32_t size_lightbuffer = sizeof(LightBuffer);
 
 enum class VertexFormat : uint8_t { float2, float3, float4 };
 

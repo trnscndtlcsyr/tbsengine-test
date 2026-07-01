@@ -2,8 +2,6 @@
 
 void Camera::SetPosition(float x, float y, float z)
 {
-	position = DirectX::XMFLOAT3(x, y, z);
-
 	DirectX::XMVECTOR eye = DirectX::XMVectorSet(x, y, z, 0.0f);
 	DirectX::XMVECTOR focus = DirectX::XMVectorSet(x, y, z + 1.0f, 0.0f);
 	DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -24,5 +22,5 @@ void Camera::SetProjection(ProjectionType type, float width, float height)
 
 DirectX::XMMATRIX Camera::GetViewProjectionMatrix() const
 {
-	return DirectX::XMMatrixTranspose(DirectX::XMMatrixMultiply(viewMatrix, projectionMatrix));
+	return DirectX::XMMatrixTranspose(viewMatrix * projectionMatrix);
 }

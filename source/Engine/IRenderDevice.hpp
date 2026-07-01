@@ -1,5 +1,6 @@
 #pragma once
 #include "RenderDeviceTypes.hpp"
+#include <cstdint>
 
 class IRenderDevice {
 public:
